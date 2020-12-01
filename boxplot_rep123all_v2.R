@@ -6,8 +6,10 @@ rm(list = ls())
 # 1.Configuration
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) # set current dir as WD
 
-rootfolder = getwd()   # rootfolder: name of the folder containing the raw data files,
-rawdatafolder = ""         # rawfolder: name of the folder containing the raw data files,
+xlabel = ""
+ylabel = "Expression"
+
+rawdatafolder = ""         # rawfolder: name of the folder containing the raw data files (ex: "example1")
 outputfolder = format(Sys.time(), "Results_rep123all_%Y%m%d_%H%M%S")  # outfolder: name of the folder to which graphs are exported
 raw_ext = "csv"  # raw_ext: Raw datafiles extension ("csv", "tsv", "txt") WITHOUT the dot (.)
 sep = ";"   # column separator for raw data files (";" or "," or "\t")
@@ -55,8 +57,8 @@ trans <- log2 # Log2 Transformation
   
 ##############################################################################################
   # 2.Compile data
-  rawfolder = file.path(rootfolder, rawdatafolder)
-  outfolder = file.path(rootfolder, outputfolder)
+  rawfolder = file.path(getwd(), rawdatafolder)
+  outfolder = file.path(getwd(), outputfolder)
 
   # create results folder
   dir.create(outfolder, showWarnings = FALSE)
@@ -96,7 +98,7 @@ trans <- log2 # Log2 Transformation
   df$exp_gene = (df$E_gene^(-df$Cp_gene))
   df$exp_ref = (df$E_ref^(-df$Cp_ref))
   
-  df$expression = round(df$exp_gene / df$exp_ref,5)
+  df$expression = df$exp_gene / df$exp_ref
   
   # convert Cp > ctmax to expression=0
   # df[df$Cp_gene >=ctmax, "expression"] = 0

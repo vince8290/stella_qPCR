@@ -6,8 +6,10 @@ rm(list = ls())
 # 1.Configuration
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) # set current dir as WD
 
-rootfolder = getwd()   # rootfolder: name of the folder containing the raw data files,
-rawdatafolder = ""         # rawfolder: name of the folder containing the raw data files,
+xlabel = ""
+ylabel = "Expression"
+
+rawdatafolder = ""         # rawfolder: name of the folder containing the raw data files (ex: "example1")
 outputfolder = format(Sys.time(), "Results_all-og_%Y%m%d_%H%M%S")  # outfolder: name of the folder to which graphs are exported
 raw_ext = "csv"  # raw_ext: Raw datafiles extension ("csv", "tsv", "txt") WITHOUT the dot (.)
 sep = ";"   # column separator for raw data files (";" or "," or "\t")
@@ -19,9 +21,9 @@ columns_to_keep = c("id","cultivar","gene","rep","dpi", "Cp_gene","Cp_ref","Expr
 
 #---------------------------------------------------------------------------------------------
 # Graphics parameters
-labels <- c(0.0,0.1, 0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 10.0,15.0,20.0,25.0,30.0)
+labels <- c(0.0,0.1, 0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 10.0,15.0,20.0,25.0,30.0, 100, 240)
 graph_unit = "cm"   # unit for graphs sizes ("cm", "in" or "mm" )
-graph_width = 60    # graph width
+graph_width = 100    # graph width
 graph_height = 20   # graph height
 graph_dpi = 600     # graph resolution (typically between 100 and 1200)
 plot_device = "png" # graph file extension
@@ -55,8 +57,8 @@ trans <- log2 # Log2 Transformation
   
 ##############################################################################################
   # 2.Compile data
-  rawfolder = file.path(rootfolder, rawdatafolder)
-  outfolder = file.path(rootfolder, outputfolder)
+  rawfolder = file.path(getwd(), rawdatafolder)
+  outfolder = file.path(getwd(), outputfolder)
 
   # create results folder
   dir.create(outfolder, showWarnings = FALSE)
@@ -96,8 +98,8 @@ trans <- log2 # Log2 Transformation
   df$exp_gene = (df$E_gene^(-df$Cp_gene))
   df$exp_ref = (df$E_ref^(-df$Cp_ref))
   
-  df$expression = round(df$exp_gene / df$exp_ref,5)
- 
+  df$expression = df$exp_gene / df$exp_ref
+  
   # convert Cp > ctmax to expression=0
   # df[df$Cp_gene >=ctmax, "expression"] = 0
  
@@ -133,6 +135,7 @@ trans <- log2 # Log2 Transformation
   # Transform labels to fit the data transformation
   breaks <- trans(labels)
 
+  
   # all reps
   for (cult in unique(df3$cultivar))  {
     
@@ -142,7 +145,7 @@ trans <- log2 # Log2 Transformation
       theme(legend.position="none",axis.text = element_text(face="bold",size=10), axis.text.x=element_text(angle=90, hjust=1)) +
       scale_y_continuous(breaks=breaks, labels=labels) +
       ggtitle(paste0(cult))+
-      labs(x="", y="Expression") +
+      labs(x=xlabel, y=ylabel) +
       geom_boxplot(outlier.color = "white", aes(fill=factor(gene), alpha=0.1)) +
       geom_point(position=position_jitterdodge(jitter.width=0.0, dodge.width = 0.75), cex=1, alpha=0.3,
                  aes(color=factor(rep)), show.legend = F) +
@@ -152,8 +155,9 @@ trans <- log2 # Log2 Transformation
       geom_hline(yintercept =trans(0.1), color="grey") +
       geom_hline(yintercept =trans(3), color="black") +
       # geom_vline(xintercept=c(4.5, 8.5,12.5)) +
-      theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())
- 
+      theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank()) +
+      theme(axis.text.x = element_text(margin=margin(10,0,0,0)))
+    
     
     # windows()   # Uncomment to create one new window per graph
     # plot(p)   # uncomment to draw plots in R (if commented, plots will be exported to files)
@@ -178,7 +182,7 @@ trans <- log2 # Log2 Transformation
               axis.title = element_text(face="bold",size=16)) +
         scale_y_continuous(breaks=breaks, labels=labels) +
         ggtitle(paste0(cult))+
-        labs(x="", y="Expression") +
+        labs(x=xlabel, y=ylabel) +
         geom_boxplot(outlier.color = "white", aes(fill=factor(gene), alpha=0.1)) +
         geom_point(position=position_jitterdodge(jitter.width=0.0, dodge.width = 0.75), cex=2, alpha=0.3,
                    aes(color=factor(rep)), show.legend = F) +
@@ -187,12 +191,9 @@ trans <- log2 # Log2 Transformation
         geom_hline(yintercept =trans(0.25), color="orange") +
         geom_hline(yintercept =trans(0.1), color="grey") +
         geom_hline(yintercept =trans(3), color="black") +
-        # geom_vline(xintercept=c(4.5, 8.5,12.5)) +
         theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())
       
-      
-       # facet_wrap("gene", ncol=4, scales="free_x")
-      
+
       
       # windows()   # Uncomment to create one new window per graph
       # plot(p)   # uncomment to draw plots in R (if commented, plots will be exported to files)
