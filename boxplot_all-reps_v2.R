@@ -9,8 +9,8 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) # set current dir as
 xlabel = ""
 ylabel = "Expression"
 
-rawdatafolder = ""         # rawfolder: name of the folder containing the raw data files (ex: "example1")
-outputfolder = format(Sys.time(), "Results_all-reps_%Y%m%d_%H%M%S")  # outfolder: name of the folder to which graphs are exported
+rawdatafolder = "example3"         # rawfolder: name of the folder containing the raw data files (ex: "example1")
+outputfolder = file.path(rawdatafolder, format(Sys.time(), "Results_all-reps_%Y%m%d_%H%M%S"))  # outfolder: name of the folder to which graphs are exported
 raw_ext = "csv"  # raw_ext: Raw datafiles extension ("csv", "tsv", "txt") WITHOUT the dot (.)
 sep = ";"   # column separator for raw data files (";" or "," or "\t")
 dec = ","   # decimal character for raw data files("." or ",")
@@ -130,7 +130,9 @@ outfolder = file.path(getwd(), outputfolder)
   df3 = merge(df, df2) %>%
     arrange(max_med, gene, rep, dpi)
   
-  
+  # Export final dataframe to .RData file
+  save(df3, file=file.path(outfolder,"df3.RData"))
+  write_excel_csv2(df3, path=file.path(outfolder,"df3.csv"))
   
   
 ##############################################################################################
