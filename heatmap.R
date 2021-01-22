@@ -17,7 +17,7 @@ dec = ","   # decimal character for raw data files("." or ",")
 # ctmax = 33 # ctmax : maximal Ct value to consider. beyond this value, expression will be 0. no cutoff applied if ctmax=0
 required_packages = c("tidyverse","tools")
 columns_to_keep = c("id","cultivar","gene","rep","dpi", "Cp_gene","Cp_ref","Expression","exclude","E_gene","E_ref","file")
-categories = c("< 0.05", "0.05 - 0.1", "0.1 - 0.25", "0.25 - 0.5", "0.5 - 1", "1 - 3", "3 - 10", "> 10")
+categories = c("< 0.008", "0.008 - 0.04", "0.04 - 0.2", "0.2 - 1", "1 - 5", "> 5")
 
 #---------------------------------------------------------------------------------------------
 # Graphics parameters
@@ -141,14 +141,12 @@ df_heatmap = df3 %>%
   ungroup
 
 # create groups based on median
-df_heatmap$heatmap=paste0("> 10")
-df_heatmap[df_heatmap$median_exp<10,"heatmap"]="3 - 10"
-df_heatmap[df_heatmap$median_exp<3,"heatmap"]="1 - 3"
-df_heatmap[df_heatmap$median_exp<1,"heatmap"]="0.5 - 1"
-df_heatmap[df_heatmap$median_exp<0.5,"heatmap"]="0.25 - 0.5"
-df_heatmap[df_heatmap$median_exp<0.25,"heatmap"]="0.1 - 0.25"
-df_heatmap[df_heatmap$median_exp<0.1,"heatmap"]="0.05 - 0.1" 
-df_heatmap[df_heatmap$median_exp<0.05,"heatmap"]="< 0.05"
+df_heatmap$heatmap=paste0("> 5")
+df_heatmap[df_heatmap$median_exp<5,"heatmap"]="1 - 5"
+df_heatmap[df_heatmap$median_exp<1,"heatmap"]="0.2 - 1"
+df_heatmap[df_heatmap$median_exp<0.2,"heatmap"]="0.04 - 0.2"
+df_heatmap[df_heatmap$median_exp<0.04,"heatmap"]="0.008 - 0.04"
+df_heatmap[df_heatmap$median_exp<0.008,"heatmap"]="< 0.008"
 
 # Order groups correctly
 df_heatmap$heatmap = factor(df_heatmap$heatmap)
